@@ -1,0 +1,80 @@
+!                           -*-f90-*-     (for Emacs)
+!
+!  Initialisation parameters
+!
+&init_pars
+  cvsid='$Id: start.in,v 1.1 2017/12/06 08:39:23 wlyra Exp $',
+  ip=10,                        ! debugging parameter
+
+!
+! in Meru et al 2017:
+!     sigma = sigma_c * (r/r_c)^-p
+!     r varies from 10 au to 400 au, and r_c = 200 au
+!     => r/r_c is unitless, varies from .05 to 2
+!     => will use r/r_c as radial coordinate
+!
+  !xyz0  =  0.05,0.00000000000000000000,-0.26,
+  !xyz1  =  2.00,6.28318530717958647688, 0.26,
+
+  xyz0  =  0.30,00000000000000000000,-0.26,
+  xyz1  =  2.00,6.28318530717958647688, 0.26,
+
+  lperi = F  , T  , T,         ! periodic direction?
+
+  lshift_origin = F,F,F,
+  lshift_origin_lower = F,T,T,
+
+!        ux    uy   uz  rho  ss   shock  spot  gr   gphi  gz
+  bcx =  'a', 'a2','s','a2','a2',  's',  's', 's',  's',  's' ! may need to be changed; particularly "out"
+  !bcx =  'a', 'a2','s','a2',       's',  's', 's',  's',  's' ! may need to be changed; particularly "out"
+!
+! s   => dq/dx = 0
+! a   =>  q    = 0
+! a2  => dq/dx = const
+! out => outflow
+!
+  llocal_iso=F
+  lwrite_ic=T
+  lwrite_aux=T
+  coord_system='cylindrical'
+  lcylindrical_gravity=T
+  grid_func='log','linear','linear'
+  lproper_averages=T
+/
+&initial_condition_pars
+  density_power_law=0.375     ! see Meru et al 2017
+  temperature_power_law=0.75  ! see Meru et al 2017
+  lselfgravity_logspirals=T
+  lcorrect_selfgravity=T
+  imidplane='power-law'
+  !imidplane='truncated'
+  gravitational_const=0.04217896346757 ! need Mdisc = 0.49M*
+  !gravitational_const=0.17 ! need Mdisc = 0.49M*
+/
+&eos_init_pars
+  cs0   = 0.1677816937659  ! T = 13.4 K * (r/200au)^-q
+  rho0  = 1.0
+  gamma = 1.4              ! 7/5
+/
+&hydro_init_pars
+  inituu='gaussian-noise-rprof'
+  ampluu=1e-4 !1.12932726136d-4 ! 0.1% of soundspeed
+  rnoise_int=0.4
+  rnoise_ext=1.8
+/
+&density_init_pars
+  ldensity_nolog=T
+/
+&grav_init_pars
+  ipotential='no-smooth'
+  g0=1.                        !GM* = 1, G = 1 => M* = 1
+/
+&selfgrav_init_pars
+  gravitational_const=0.04217896346757 !8.3e-3!4.15e-2  ! need Mdisc = 0.49M*
+  !gravitational_const=0.17 !8.3e-3!4.15e-2  ! need Mdisc = 0.49M*
+  lselfgravity_gas=T
+/
+&poisson_init_pars
+/
+&entropy_init_pars
+/

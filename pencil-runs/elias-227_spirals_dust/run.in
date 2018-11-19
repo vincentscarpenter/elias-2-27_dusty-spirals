@@ -1,0 +1,88 @@
+!                           -*-f90-*-     (for Emacs)
+!
+!  Run parameters!
+!
+&run_pars
+  cvsid='$Id: run.in,v 1.2 2017/12/06 09:02:30 wlyra Exp $',
+  ip=10,
+  !nt=1000, it1=25, it1d=100,  isave=1000, itorder=3, 
+  nt=10000000, it1=25, it1d=100,  isave=1000, itorder=3, 
+  tmax=628.3, 
+  max_walltime=86100
+  cdt=0.4, 
+  cdtv=0.4, 
+  dtmin=1e-6,
+  dsnap=6.283 ,dvid=0.1256, d2davg=6.283 
+  wborder_int=0.05
+  wborder_ext=0.1
+  !tborder=1.0
+  fraction_tborder = 0.1 
+  lpencil_check=F
+  lpencil_check_small=F
+  !dt=1e-3
+  lfargo_advection=T
+/
+&eos_run_pars
+/
+&hydro_run_pars
+  borderuu='initial-condition'
+/
+&density_run_pars
+  idiff='hyper3-mesh','diffrho-shock'
+  diffrho_hyper3_mesh=20
+  diffrho_shock=10.0
+  borderlnrho='initial-condition'
+/
+&grav_run_pars
+/
+&viscosity_run_pars
+  ivisc='hyper3-mesh','nu-shock'
+  nu_shock=10.0
+  nu_hyper3_mesh=20
+/
+&shock_run_pars
+/
+&selfgrav_run_pars
+  lselfgravity_gas=T
+/
+&poisson_run_pars
+/
+&entropy_run_pars
+  !borderss='initial-temperature'
+  borderss='initial-condition'
+  iheatcond='hyper3-mesh','shock'
+  chi_shock=10.0
+  chi_hyper3_mesh=20
+  tau_cool=20
+  ltau_cool_variable=T
+  TTref_cool=0.0703767419            ! T=cs^2/(cp*(gamma-1))
+  TT_powerlaw=0.75
+/
+&particles_run_pars
+!
+! Drag force felt by particles, from gas.
+!
+  ldragforce_dust_par=T          ! dust particles will feel a drag force from the gas, getting a friction time based on tausp
+  !ldraglaw_simple=T             ! draglaw sets how the friction time is calculated: simple -> friction time = tausp -> drag force = (u - v)/tausp
+  ldraglaw_epstein=T             ! draglaw sets how the friction time is calculated: epstein drag -> same as simple, allows for scaling with Omega_K or fluid density
+  !ldraglaw_variable=T           ! only one of variable or variable_density may be turned on with epstein drag; multiplies stopping time by Omega_K:     tausp -> tausp * r^(-1.5)
+  ldraglaw_variable_density=T    ! only one of variable or variable_density may be turned on with epstein drag; multiplies stopping time by gas density: tausp -> tausp * gas_density
+  ldiffuse_dragf=F               ! drag force diffusion
+
+!
+! Backreaction: drag force felt by gas from dust (Newtonian pair with drag force applied to particles from gas)
+  !ldragforce_gas_par=T
+!
+
+!
+! Gravity felt by particles: not handled in gravity_simple, which is capable of handling dust gravity only if the dust is modelled as a fluid
+!
+  gravr_profile='newtonian-central'
+  gravr=0.04217896346757             ! same as gas ; this works for imidplane='power-law'
+  !gravr=0.17                        ! same as gas ; this works for imidplane='truncated'
+  lcylindrical_gravity_par=T         ! treat particles with cylindrical coordinates ; appears to force 2D as well
+  gravsmooth=0.0                     ! necessary to smooth particle gravity?
+!
+  lcheck_exact_frontier=T
+  lmigration_redo=T
+/

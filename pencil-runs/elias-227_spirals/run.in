@@ -1,0 +1,60 @@
+!                           -*-f90-*-     (for Emacs)
+!
+!  Run parameters!
+!
+&run_pars
+  cvsid='$Id: run.in,v 1.2 2017/12/06 09:02:30 wlyra Exp $',
+  ip=10,
+  !nt=1000, it1=25, it1d=100,  isave=1000, itorder=3, 
+  nt=10000000, it1=25, it1d=100,  isave=1000, itorder=3, 
+  tmax=628.3, 
+  max_walltime=86100
+  cdt=0.4, 
+  cdtv=0.4, 
+  dtmin=1e-6,
+  dsnap=6.283 ,dvid=0.1256, d2davg=6.283 
+  wborder_int=0.05
+  wborder_ext=0.1
+  !tborder=1.0
+  fraction_tborder = 0.1 
+  lpencil_check=F
+  lpencil_check_small=F
+  !dt=1e-3
+  lfargo_advection=T
+/
+&eos_run_pars
+/
+&hydro_run_pars
+  borderuu='initial-condition'
+/
+&density_run_pars
+  idiff='hyper3-mesh','diffrho-shock'
+  diffrho_hyper3_mesh=20
+  diffrho_shock=10.0
+  borderlnrho='initial-condition'
+/
+&grav_run_pars
+/
+&viscosity_run_pars
+  ivisc='hyper3-mesh','nu-shock'
+  nu_shock=10.0
+  nu_hyper3_mesh=20
+/
+&shock_run_pars
+/
+&selfgrav_run_pars
+  lselfgravity_gas=T
+/
+&poisson_run_pars
+/
+&entropy_run_pars
+  !borderss='initial-temperature'
+  borderss='initial-condition'
+  iheatcond='hyper3-mesh','shock'
+  chi_shock=10.0
+  chi_hyper3_mesh=20
+  tau_cool=20
+  ltau_cool_variable=T
+  TTref_cool=0.0703767419 !0.00625 ! T=cs^2/(cp*(gamma-1))
+  TT_powerlaw=0.75
+/

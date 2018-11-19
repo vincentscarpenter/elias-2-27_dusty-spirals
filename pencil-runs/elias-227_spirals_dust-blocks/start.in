@@ -1,0 +1,106 @@
+!                           -*-f90-*-     (for Emacs)
+!
+!  Initialisation parameters
+!
+&init_pars
+  cvsid='$Id: start.in,v 1.1 2017/12/06 08:39:23 wlyra Exp $',
+  ip=10,                        ! debugging parameter
+
+!
+! in Meru et al 2017:
+!     sigma = sigma_c * (r/r_c)^-p
+!     r varies from 10 au to 400 au, and r_c = 200 au
+!     => r/r_c is unitless, varies from .05 to 2
+!     => will use r/r_c as radial coordinate
+!
+  !xyz0  =  0.05,0.00000000000000000000,-0.26,
+  !xyz1  =  2.00,6.28318530717958647688, 0.26,
+!
+! moving the inner boundary to 0.3 from 0.05 speeds up the runs a lot,
+! shouldn't exclude anything interesting -- meru et al do not even
+! resolve GI this far in
+!
+  xyz0  =  0.3,0000000000000000000000,-0.26,
+  xyz1  =  2.0,6.28318530717958647688, 0.26,
+!
+  lperi = F  , T  , T,
+!
+  lshift_origin = F,F,F,
+  lshift_origin_lower = F,T,T,
+!
+! s   => dq/dx = 0
+! a   =>  q    = 0
+! a2  => dq/dx = const
+! out => outflow
+!
+!        ux    uy   uz  rho  ss   shock  spot  gr   gphi  gz
+  bcx =  'a', 'a2','s','a2','a2',  's',  's', 's',  's',  's'
+!
+! ux: goes to zero at boundaries ; uy: maintain radial rotation profile ; uz: 2D problem
+! rho: maintain radial density profile ; ss: maintain radial energy profile
+! spot: not used with logspirals, irrelevant
+! self gravity accs dont have their derivatives taken, ghost zone values shouldnt matter
+!
+  !bcx =  'a', 'a2','s','a2',       's',  's', 's',  's',  's'     ! without energy
+  !bcy =                                                           ! periodic direction ; no need to specify bc
+  !bcz =                                                           ! periodic direction ; no need to specify bc
+!
+  llocal_iso=F
+  lwrite_ic=T
+  lwrite_aux=T
+  coord_system='cylindrical'
+  lcylindrical_gravity=T
+  grid_func='log','linear','linear'
+  lproper_averages=T
+/
+&initial_condition_pars
+  density_power_law=0.375              ! see Meru et al 2017
+  imidplane='power-law'                ! standard power law in radius for the midplane gas density
+  !imidplane='truncated'               ! power law, exponentially truncated past a certain point
+  temperature_power_law=0.75           ! see Meru et al 2017
+  lselfgravity_logspirals=T
+  lcorrect_selfgravity=T
+  gravitational_const=0.04217896346757 ! need Mdisc = 0.49M* ; this works for imidplane='power-law'
+  !gravitational_const=0.17            ! need Mdisc = 0.49M* ; this works for imidplane='truncated'
+/
+&eos_init_pars
+  cs0   = 0.1677816937659  ! see Meru et al 2017 ; corresponds to T = 13.4 K * (r/200au)^-q
+  rho0  = 1.0
+  gamma = 1.4              ! see Meru et al 2017
+/
+&hydro_init_pars
+  inituu='gaussian-noise-rprof'
+  ampluu=1e-4       ! 0.1% of soundspeed
+  rnoise_int=0.4    ! no noise close to the inner boundary
+  rnoise_ext=1.8    ! no noise close to the outer boundary
+/
+&density_init_pars
+  ldensity_nolog=T
+/
+&grav_init_pars
+  ipotential='no-smooth'
+  g0=1.
+/
+&selfgrav_init_pars
+  gravitational_const=0.04217896346757
+  !gravitational_const=0.17
+  lselfgravity_gas=T
+/
+&poisson_init_pars
+/
+&entropy_init_pars
+/
+&particles_init_pars
+  initxxp='random-cylindrical'    ! radial coordinates random from power law ; azimuth random from uniform ; z random from uniform
+  dustdensity_powerlaw=0.375      ! same as gas
+  initvvp='Keplerian'             ! Keplerian angular velocity
+  bcpx='rmv',bcpy='p',bcpz='p'    ! remove particles as they cross the inner or outer boundary of the disk
+  lcheck_exact_frontier=T
+  lmigration_real_check=T
+  lparticlemesh_tsc=T             ! interpolation scheme for moving particle quantities to the mesh and back ; if neither tsc nor cic specified, ngp assumed
+  !lparticlemesh_cic=T
+  tausp=1.0                       ! stopping time ; = stokes number in code units
+  eps_dtog=0.01                   ! something something super particles? no idea what this does really ; hopefully not maintain a fixed dust to gas ratio
+  !lignore_rhop_swarm=T           ! can specify material properties of the particles instead of dtog: set eps_dtog = 0.0, uncomment this line and the next, and add particle radii
+  !rhopmat=1.0                    ! can specify material properties of the particles instead of dtog: set eps_dtog = 0.0, uncomment this line and the last, and add particle radii
+/
