@@ -3,42 +3,53 @@
 !  Run parameters!
 !
 &run_pars
-  cvsid='$Id: run.in,v 1.2 2017/12/06 09:02:30 wlyra Exp $',
-  ip=10,
-  !nt=1000, it1=25, it1d=100,  isave=1000, itorder=3, 
-  nt=10000000, it1=25, it1d=100,  isave=1000, itorder=3, 
-  tmax=628.3, 
-  max_walltime=86100
-  cdt=0.4, 
-  cdtv=0.4, 
-  dtmin=1e-6,
-  dsnap=6.283 ,dvid=0.1256, d2davg=6.283 
-  wborder_int=0.05
-  wborder_ext=0.1
-  !tborder=1.0
-  fraction_tborder = 0.1 
+  cvsid='$Id$',
+!
+! timestepping info
+!
+  nt=10000000,
+  it1=100, it1d=10000000, isave=1000,        ! timeseries every 100 timesteps ; don't care about 1d averages ; update var.dat every 1000 timesteps
+  dsnap=6.283 ,dvid=0.1256, d2davg=628.3     ! snapshot every orbit ; video frames 50 times per orbit ; dont care about 2d averaging (save space)
+  tmax=628.3, max_walltime=85800,            ! 100 orbits ; 24 hrs = 86400
+  itorder=3, cdt=0.4, cdtv=0.4,              ! 3rd order runge-kutta ; cdt and cdtv control timstep size
+  dtmin=1e-6,                                ! usually good for this set up
+!
+! border profiles, quenching
+!
+  wborder_int=0.05          ! width of interior radial border
+  wborder_ext=0.1           ! width of exterior radial border
+  !tborder=1.0              ! timescale of exponential driving to border profile
+  fraction_tborder = 0.1    ! timescale of exponential driving to border profile, as a fraction of local dynamic time
+!
+! pencil checks on for production (meh), off for testing
+!
   lpencil_check=F
   lpencil_check_small=F
-  !dt=1e-3
+!
+! fargo advection should speed things up!
+!
   lfargo_advection=T
 /
 &eos_run_pars
 /
 &hydro_run_pars
-  borderuu='initial-condition'
+  borderuu='initial-condition'   ! border profile for velocity: this option specifies driving toward initial contition
 /
 &density_run_pars
-  idiff='hyper3-mesh','diffrho-shock'
-  diffrho_hyper3_mesh=20
-  diffrho_shock=10.0
-  borderlnrho='initial-condition'
+  borderlnrho='initial-condition'        ! border profile for density: this option specifies driving toward initial contition
+!
+! diffusion properties
+!
+  idiff='hyper3-mesh','diffrho-shock'    ! hyperdiffusion in general ; special shock diffusion smoothes density at shocks
+  diffrho_hyper3_mesh=20                 ! strength of hyperdiffusion
+  diffrho_shock=10.0                     ! strength of shock diffusion
 /
 &grav_run_pars
 /
 &viscosity_run_pars
-  ivisc='hyper3-mesh','nu-shock'
-  nu_shock=10.0
-  nu_hyper3_mesh=20
+  ivisc='hyper3-mesh','nu-shock'      ! hyperviscosity in general ; special shock viscosity smoothes velocity at shocks
+  nu_shock=10.0                       ! strength of hyperviscosity
+  nu_hyper3_mesh=20                   ! strength of shock viscosity
 /
 &shock_run_pars
 /
@@ -48,15 +59,19 @@
 &poisson_run_pars
 /
 &entropy_run_pars
-  !borderss='initial-temperature'
-  borderss='initial-condition'
-  iheatcond='hyper3-mesh','shock'
-  chi_shock=10.0
-  chi_hyper3_mesh=20
-  tau_cool=20
-  ltau_cool_variable=T
-  TTref_cool=0.0703767419            ! T=cs^2/(cp*(gamma-1))
-  TT_powerlaw=0.75
+  borderss='initial-condition'       ! border profile for energy: this option specifies driving toward initial contition
+!
+! heat conduction properties
+!
+  iheatcond='hyper3-mesh','shock'    ! hyperconduction of heat in general ; special shock heat conduction smoothes energy at shocks
+  chi_hyper3_mesh=20                 ! strength of heat hyperconduction
+  chi_shock=10.0                     ! strength of shock heat conduction
+!
+! cooling
+!
+  tau_cool=20                ! cooling time, in dynamic times
+  TTref_cool=0.0703767419    ! temperature profile to cool to = TTref_cool*r^(-TT_powerlaw) ; T=cs^2/(cp*(gamma-1)), for converting from cs0 in start.in
+  TT_powerlaw=0.75           ! temperature profile to cool to = TTref_cool*r^(-TT_powerlaw)
 /
 &particles_run_pars
 !
@@ -75,7 +90,7 @@
 !
 
 !
-! Gravity felt by particles: not handled in gravity_simple, which is capable of handling dust gravity only if the dust is modelled as a fluid
+! Gravity felt by particles: not handled in gravity module, which is capable of handling dust gravity only if the dust is modelled as a fluid
 !
   gravr_profile='newtonian-central'
   gravr=0.04217896346757             ! same as gas ; this works for imidplane='power-law'

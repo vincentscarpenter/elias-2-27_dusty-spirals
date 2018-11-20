@@ -8,7 +8,7 @@
 !  MAUX CONTRIBUTION 2
 !  COMMUNICATED AUXILIARIES 2
 !  lnTT (3) and cs2 (1)
-integer, parameter :: ncpus=4,nprocx=2,nprocy=2,nprocz=1
+integer, parameter :: ncpus=48,nprocx=6,nprocy=8,nprocz=1
 integer, parameter :: nxgrid=384,nygrid=768,nzgrid=1
 integer, parameter :: npar=400002,mpar_loc=400002, npar_mig=2000
 !integer, parameter :: npar_species=3
